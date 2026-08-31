@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route  } from "react-router-dom";
- import "./app.css";
+ 
  
  
 import MainNavbar from "./components/landing/components/MainNavbar";
