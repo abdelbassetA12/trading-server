@@ -355,7 +355,7 @@ export default function TestnetShart() {
 
     const interval = setInterval(
       fetchOpenOrders,
-      3000
+      30000
     );
 
     return () => clearInterval(interval);
@@ -391,7 +391,7 @@ export default function TestnetShart() {
 
     const interval = setInterval(
       fetchBalances,
-      5000
+      30000
     );
 
     return () => clearInterval(interval);
@@ -463,7 +463,7 @@ export default function TestnetShart() {
 
     const i = setInterval(
       loadSignals,
-      5000
+      30000
     );
 
     return () => clearInterval(i);
@@ -493,7 +493,7 @@ export default function TestnetShart() {
 
     const interval = setInterval(
       fetchBinanceTrades,
-      3000
+       30000
     );
 
     return () => clearInterval(interval);
