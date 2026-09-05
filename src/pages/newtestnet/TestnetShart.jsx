@@ -1311,6 +1311,27 @@ export default function TestnetShart() {
 
             </div>
 
+            <div className="trades-summary">
+  <span>TOTAL PROFIT</span>
+  <strong
+    className={
+      binanceTrades.reduce(
+        (total, t) => total + (Number(t.profit) || 0),
+        0
+      ) >= 0
+        ? "profit-positive"
+        : "profit-negative"
+    }
+  >
+    {binanceTrades
+      .reduce(
+        (total, t) => total + (Number(t.profit) || 0),
+        0
+      )
+      .toFixed(2)} USDT
+  </strong>
+</div>
+
             <span className="live-badge">
               ● LIVE
             </span>
@@ -3350,7 +3371,30 @@ export default function TestnetShart() {
 
 
 
+.trades-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 7px 11px;
+  border: 1px solid #26344a;
+  border-radius: 7px;
+  background: #101927;
+}
 
+.trades-summary span {
+  color: #475569;
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+}
+
+.trades-summary strong {
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+  font-size: 11px;
+}
 
 
 
