@@ -350,6 +350,11 @@ export default function TestnetShart() {
     }
   };
 
+
+  useEffect(() => {
+  fetchOpenOrders();
+}, []);
+/*
   useEffect(() => {
     fetchOpenOrders();
 
@@ -360,7 +365,7 @@ export default function TestnetShart() {
 
     return () => clearInterval(interval);
   }, []);
-
+*/
   /* ================= BALANCES ================= */
 
   const fetchBalances = async () => {
@@ -386,6 +391,11 @@ export default function TestnetShart() {
     }
   };
 
+
+  useEffect(() => {
+  fetchBalances();
+}, []);
+/*
   useEffect(() => {
     fetchBalances();
 
@@ -396,6 +406,7 @@ export default function TestnetShart() {
 
     return () => clearInterval(interval);
   }, []);
+  */
 
   /* ================= CANCEL ORDER ================= */
 
@@ -437,6 +448,7 @@ export default function TestnetShart() {
       );
 
       alert("✅ Conversion Done");
+      fetchBalances();
 
       console.log(res.data);
     } catch (err) {
@@ -488,6 +500,12 @@ export default function TestnetShart() {
     }
   };
 
+
+
+  useEffect(() => {
+  fetchBinanceTrades();
+}, []);
+ /*
   useEffect(() => {
     fetchBinanceTrades();
 
@@ -498,6 +516,7 @@ export default function TestnetShart() {
 
     return () => clearInterval(interval);
   }, []);
+  */
 
   function formatDate(time) {
     const d = new Date(time);
