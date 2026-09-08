@@ -49,6 +49,8 @@ export default function TestnetShart() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [newPrice, setNewPrice] = useState("");
 
+  const [totalUSDT, setTotalUSDT] = useState(0);
+
   function getSignalStyle(signal) {
     if (signal.includes("BUY")) return { color: "#22c55e" };
     if (signal.includes("SELL")) return { color: "#ef4444" };
@@ -335,6 +337,7 @@ export default function TestnetShart() {
      TESTNET
   ========================================================= */
 
+ 
   const fetchOpenOrders = async () => {
     try {
       const res = await axios.get(
@@ -367,7 +370,33 @@ export default function TestnetShart() {
   }, []);
 */
   /* ================= BALANCES ================= */
+const fetchBalances = async () => {
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/testnet/balance`
+    );
 
+    const data = await res.json();
+
+    const filtered = data.filter((b) =>
+      ["USDT", "BTC", "ETH", "SOL"].includes(
+        b.asset
+      )
+    );
+
+    setBalances(filtered);
+
+    const total = await calculateTotalUSDT(filtered);
+
+    setTotalUSDT(total);
+  } catch (err) {
+    console.error(
+      "Error fetching balances:",
+      err
+    );
+  }
+};
+/*
   const fetchBalances = async () => {
     try {
       const res = await fetch(
@@ -389,7 +418,7 @@ export default function TestnetShart() {
         err
       );
     }
-  };
+  };*/
 
 
   useEffect(() => {
@@ -408,6 +437,43 @@ export default function TestnetShart() {
   }, []);
   */
 
+
+
+
+  const calculateTotalUSDT = async (balances) => {
+  let total = 0;
+
+  for (const balance of balances) {
+    const free = Number(balance.free) || 0;
+    const locked = Number(balance.locked) || 0;
+    const quantity = free + locked;
+
+    if (quantity === 0) continue;
+
+    if (balance.asset === "USDT") {
+      total += quantity;
+      continue;
+    }
+
+    try {
+      const res = await axios.get(
+        `https://api.binance.com/api/v3/ticker/price?symbol=${balance.asset}USDT`
+      );
+
+      const price = Number(res.data.price);
+
+      if (price) {
+        total += quantity * price;
+      }
+    } catch (err) {
+      console.log(
+        `Could not get ${balance.asset} price`
+      );
+    }
+  }
+
+  return total;
+};
   /* ================= CANCEL ORDER ================= */
 
   const cancel = async (symbol, orderId) => {
@@ -888,6 +954,14 @@ export default function TestnetShart() {
                 Available assets in your testnet account
               </p>
             </div>
+
+            <div className="portfolio-total">
+  <span>TOTAL PORTFOLIO</span>
+
+  <strong>
+    {totalUSDT.toFixed(2)} USDT
+  </strong>
+</div>
 
             <span className="live-badge">
               ● LIVE
@@ -1987,6 +2061,33 @@ export default function TestnetShart() {
   color: #64748b;
 
   font-size: 9px;
+}
+
+.portfolio-total {
+  padding: 8px 12px;
+  border: 1px solid #26344a;
+  border-radius: 7px;
+  background: #101927;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.portfolio-total span {
+  color: #475569;
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+}
+
+.portfolio-total strong {
+  color: #f8fafc;
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+  font-size: 13px;
 }
 
 .chart-live span {
