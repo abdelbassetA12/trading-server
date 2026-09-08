@@ -1724,7 +1724,7 @@ export default function SignalsPage() {
   .signals-header p {
     display: none;
   }
-s
+ 
 }
  
 `}
