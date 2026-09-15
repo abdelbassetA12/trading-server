@@ -51,6 +51,11 @@ export default function TestnetShart() {
 
   const [totalUSDT, setTotalUSDT] = useState(0);
 
+
+
+  const [testTPPrice, setTestTPPrice] = useState("");
+const [testingTP, setTestingTP] = useState(false);
+
   function getSignalStyle(signal) {
     if (signal.includes("BUY")) return { color: "#22c55e" };
     if (signal.includes("SELL")) return { color: "#ef4444" };
@@ -663,6 +668,53 @@ const fetchBalances = async () => {
     }
   };
 
+
+  const testTakeProfit = async () => {
+  try {
+    if (!testTPPrice) {
+      alert("Enter TP price");
+      return;
+    }
+
+    setTestingTP(true);
+
+    const res = await axios.post(
+      `${API_BASE}/api/testnet/test-take-profit`,
+      {
+        symbol,
+        price: Number(testTPPrice),
+      }
+    );
+
+    console.log(
+      "✅ TEST TP RESULT:",
+      res.data
+    );
+
+    alert(
+      `✅ SELL LIMIT CREATED\n\nOrder ID: ${res.data.order?.orderId}`
+    );
+
+    setTestTPPrice("");
+
+    await fetchOpenOrders();
+    await fetchBalances();
+  } catch (err) {
+    console.error(
+      "❌ TEST TP ERROR:",
+      err.response?.data || err.message
+    );
+
+    alert(
+      err.response?.data?.error ||
+        err.message ||
+        "TP test failed"
+    );
+  } finally {
+    setTestingTP(false);
+  }
+};
+
   /* =========================================================
      UI
   ========================================================= */
@@ -1225,6 +1277,68 @@ const fetchBalances = async () => {
           </div>
 
         </div>
+
+
+        <div className="dashboard-card">
+  <div className="card-header">
+    <div>
+      <span className="card-kicker">
+        TP TEST
+      </span>
+
+      <h2>Test Take Profit</h2>
+
+      <p>
+        Create a SELL LIMIT using the current free balance
+      </p>
+    </div>
+
+    <span className="live-badge">
+      TESTNET
+    </span>
+  </div>
+
+  <div className="converter-form">
+    <div className="asset-input">
+      <label>SYMBOL</label>
+
+      <select
+        value={symbol}
+        onChange={(e) =>
+          setSymbol(e.target.value)
+        }
+      >
+        <option>BTCUSDT</option>
+        <option>ETHUSDT</option>
+        <option>SOLUSDT</option>
+      </select>
+    </div>
+    <div></div>
+
+    <div className="asset-input amount-input">
+      <label>TP PRICE</label>
+
+      <input
+        type="number"
+        value={testTPPrice}
+        onChange={(e) =>
+          setTestTPPrice(e.target.value)
+        }
+        placeholder="Enter SELL price"
+      />
+    </div>
+
+    <button
+      className="convert-button"
+      onClick={testTakeProfit}
+      disabled={testingTP}
+    >
+      {testingTP
+        ? "Creating..."
+        : "Create SELL LIMIT"}
+    </button>
+  </div>
+</div>
 
 
         {/* =================================================

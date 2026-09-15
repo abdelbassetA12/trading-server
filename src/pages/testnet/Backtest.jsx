@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import API_BASE from "../../config/api";
 
 export default function Backtest() {
-  const [symbol, setSymbol] = useState("BTCUSDT");
+  const [symbol, setSymbol] = useState("ETHUSDT");
   const [interval, setIntervalValue] = useState("15m");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
