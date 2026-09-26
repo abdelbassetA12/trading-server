@@ -52,12 +52,12 @@ export default function App() {
  
 
       
-          <Route path="/" element={ <SignalsPage   />} />
+         
          
 
            <Route path="/backtest" element={<Backtest />} />
           <Route path="/signals" element={<SignalsPage />} />
-         <Route path="/testnetShart" element={<TestnetShart />} />
+         <Route path="/" element={<TestnetShart />} />
 
 
          <Route path="/NewBacktest" element={<NewBacktest />} />

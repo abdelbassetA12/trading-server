@@ -384,7 +384,7 @@ const fetchBalances = async () => {
     const data = await res.json();
 
     const filtered = data.filter((b) =>
-      ["USDT", "BTC", "ETH", "SOL"].includes(
+      ["USDT", "XRP", "ETH", "SOL","BTC"].includes(
         b.asset
       )
     );
