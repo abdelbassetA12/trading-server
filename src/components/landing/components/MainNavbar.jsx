@@ -80,8 +80,8 @@ export default function MainNavbar() {
         <nav className="trading-nav">
 
           <Link
-            to="/testnetShart"
-            className={isActive("/testnetShart") ? "active" : ""}
+            to="/"
+            className={isActive("/") ? "active" : ""}
           >
             <FiTrendingUp />
             <span>Trading</span>

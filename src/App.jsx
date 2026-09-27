@@ -58,6 +58,7 @@ export default function App() {
            <Route path="/backtest" element={<Backtest />} />
           <Route path="/signals" element={<SignalsPage />} />
          <Route path="/" element={<TestnetShart />} />
+          
 
 
          <Route path="/NewBacktest" element={<NewBacktest />} />

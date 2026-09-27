@@ -49,6 +49,13 @@ export default function TestnetShart() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [newPrice, setNewPrice] = useState("");
 
+  const [totalUSDT, setTotalUSDT] = useState(0);
+
+
+
+  const [testTPPrice, setTestTPPrice] = useState("");
+const [testingTP, setTestingTP] = useState(false);
+
   function getSignalStyle(signal) {
     if (signal.includes("BUY")) return { color: "#22c55e" };
     if (signal.includes("SELL")) return { color: "#ef4444" };
@@ -335,6 +342,7 @@ export default function TestnetShart() {
      TESTNET
   ========================================================= */
 
+ 
   const fetchOpenOrders = async () => {
     try {
       const res = await axios.get(
@@ -367,7 +375,33 @@ export default function TestnetShart() {
   }, []);
 */
   /* ================= BALANCES ================= */
+const fetchBalances = async () => {
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/testnet/balance`
+    );
 
+    const data = await res.json();
+
+    const filtered = data.filter((b) =>
+      ["USDT", "XRP", "ETH", "SOL","BTC"].includes(
+        b.asset
+      )
+    );
+
+    setBalances(filtered);
+
+    const total = await calculateTotalUSDT(filtered);
+
+    setTotalUSDT(total);
+  } catch (err) {
+    console.error(
+      "Error fetching balances:",
+      err
+    );
+  }
+};
+/*
   const fetchBalances = async () => {
     try {
       const res = await fetch(
@@ -389,7 +423,7 @@ export default function TestnetShart() {
         err
       );
     }
-  };
+  };*/
 
 
   useEffect(() => {
@@ -408,6 +442,43 @@ export default function TestnetShart() {
   }, []);
   */
 
+
+
+
+  const calculateTotalUSDT = async (balances) => {
+  let total = 0;
+
+  for (const balance of balances) {
+    const free = Number(balance.free) || 0;
+    const locked = Number(balance.locked) || 0;
+    const quantity = free + locked;
+
+    if (quantity === 0) continue;
+
+    if (balance.asset === "USDT") {
+      total += quantity;
+      continue;
+    }
+
+    try {
+      const res = await axios.get(
+        `https://api.binance.com/api/v3/ticker/price?symbol=${balance.asset}USDT`
+      );
+
+      const price = Number(res.data.price);
+
+      if (price) {
+        total += quantity * price;
+      }
+    } catch (err) {
+      console.log(
+        `Could not get ${balance.asset} price`
+      );
+    }
+  }
+
+  return total;
+};
   /* ================= CANCEL ORDER ================= */
 
   const cancel = async (symbol, orderId) => {
@@ -596,6 +667,53 @@ export default function TestnetShart() {
       );
     }
   };
+
+
+  const testTakeProfit = async () => {
+  try {
+    if (!testTPPrice) {
+      alert("Enter TP price");
+      return;
+    }
+
+    setTestingTP(true);
+
+    const res = await axios.post(
+      `${API_BASE}/api/testnet/test-take-profit`,
+      {
+        symbol,
+        price: Number(testTPPrice),
+      }
+    );
+
+    console.log(
+      "✅ TEST TP RESULT:",
+      res.data
+    );
+
+    alert(
+      `✅ SELL LIMIT CREATED\n\nOrder ID: ${res.data.order?.orderId}`
+    );
+
+    setTestTPPrice("");
+
+    await fetchOpenOrders();
+    await fetchBalances();
+  } catch (err) {
+    console.error(
+      "❌ TEST TP ERROR:",
+      err.response?.data || err.message
+    );
+
+    alert(
+      err.response?.data?.error ||
+        err.message ||
+        "TP test failed"
+    );
+  } finally {
+    setTestingTP(false);
+  }
+};
 
   /* =========================================================
      UI
@@ -889,6 +1007,14 @@ export default function TestnetShart() {
               </p>
             </div>
 
+            <div className="portfolio-total">
+  <span>TOTAL PORTFOLIO</span>
+
+  <strong>
+    {totalUSDT.toFixed(2)} USDT
+  </strong>
+</div>
+
             <span className="live-badge">
               ● LIVE
             </span>
@@ -1151,6 +1277,68 @@ export default function TestnetShart() {
           </div>
 
         </div>
+
+
+        <div className="dashboard-card">
+  <div className="card-header">
+    <div>
+      <span className="card-kicker">
+        TP TEST
+      </span>
+
+      <h2>Test Take Profit</h2>
+
+      <p>
+        Create a SELL LIMIT using the current free balance
+      </p>
+    </div>
+
+    <span className="live-badge">
+      TESTNET
+    </span>
+  </div>
+
+  <div className="converter-form">
+    <div className="asset-input">
+      <label>SYMBOL</label>
+
+      <select
+        value={symbol}
+        onChange={(e) =>
+          setSymbol(e.target.value)
+        }
+      >
+        <option>BTCUSDT</option>
+        <option>ETHUSDT</option>
+        <option>SOLUSDT</option>
+      </select>
+    </div>
+    <div></div>
+
+    <div className="asset-input amount-input">
+      <label>TP PRICE</label>
+
+      <input
+        type="number"
+        value={testTPPrice}
+        onChange={(e) =>
+          setTestTPPrice(e.target.value)
+        }
+        placeholder="Enter SELL price"
+      />
+    </div>
+
+    <button
+      className="convert-button"
+      onClick={testTakeProfit}
+      disabled={testingTP}
+    >
+      {testingTP
+        ? "Creating..."
+        : "Create SELL LIMIT"}
+    </button>
+  </div>
+</div>
 
 
         {/* =================================================
@@ -1987,6 +2175,33 @@ export default function TestnetShart() {
   color: #64748b;
 
   font-size: 9px;
+}
+
+.portfolio-total {
+  padding: 8px 12px;
+  border: 1px solid #26344a;
+  border-radius: 7px;
+  background: #101927;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.portfolio-total span {
+  color: #475569;
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+}
+
+.portfolio-total strong {
+  color: #f8fafc;
+  font-family:
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+  font-size: 13px;
 }
 
 .chart-live span {
