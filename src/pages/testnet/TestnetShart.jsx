@@ -32,6 +32,9 @@ export default function TestnetShart() {
   const tpLineRef = useRef(null);
 
   const [openOrders, setOpenOrders] = useState([]);
+
+  const [openPositions, setOpenPositions] = useState([]);
+
   const [balances, setBalances] = useState([]);
 
   const [fromAsset, setFromAsset] = useState("SOL");
@@ -358,9 +361,25 @@ const [testingTP, setTestingTP] = useState(false);
     }
   };
 
+  const fetchOpenPositions = async () => {
+  try {
+    const res = await axios.get(
+      `${API_BASE}/api/testnet/open-positions`
+    );
+
+    setOpenPositions(res.data);
+  } catch (err) {
+    console.error(
+      "Error fetching open positions:",
+      err.response?.data || err.message
+    );
+  }
+};
+
 
   useEffect(() => {
   fetchOpenOrders();
+  fetchOpenPositions();
 }, []);
 /*
   useEffect(() => {
@@ -778,6 +797,7 @@ const fetchBalances = async () => {
             <option>BTCUSDT</option>
             <option>ETHUSDT</option>
             <option>SOLUSDT</option>
+            <option>XRPUSDT</option>
           </select>
 
         </div>
@@ -1399,7 +1419,8 @@ const fetchBalances = async () => {
                     <th>SYMBOL</th>
                     <th>SIDE</th>
                     <th>TYPE</th>
-                    <th>PRICE</th>
+                    <th>ENTRY</th>
+                    <th>ORDER PRICE</th>
                     <th>QUANTITY</th>
                     <th>STATUS</th>
                     <th>CANCEL</th>
@@ -1410,9 +1431,24 @@ const fetchBalances = async () => {
 
                 <tbody>
 
-                  {openOrders.map((o, i) => (
+                  {openOrders.map((o, i) => {
 
-                    <tr key={i}>
+  const position = openPositions.find(
+    (p) => p.symbol === o.symbol
+  );
+
+  const entryPrice =
+    position?.entryPrice || null;
+
+  return (
+    <tr key={i}> 
+
+    {/*
+                    {openOrders.map((o, i) => (
+
+                    <tr key={i}>    */}
+
+                  
 
                       <td>
                         <strong>
@@ -1435,6 +1471,12 @@ const fetchBalances = async () => {
                       <td>
                         {o.type}
                       </td>
+
+                      <td className="number-cell entry-price">
+  {entryPrice
+    ? entryPrice.toFixed(4)
+    : "-"}
+</td>
 
                       <td className="number-cell">
                         {o.price}
@@ -1481,9 +1523,12 @@ const fetchBalances = async () => {
 
                       </td>
 
-                    </tr>
+                    </tr> 
+                    );
 
-                  ))}
+                   
+
+                  })}
 
                 </tbody>
 

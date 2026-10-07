@@ -349,6 +349,7 @@ select, button, input {
           <option>BTCUSDT</option>
           <option>ETHUSDT</option>
           <option>SOLUSDT</option>
+          
         </select>
 
         <select value={interval} onChange={(e) => setIntervalVal(e.target.value)}>
