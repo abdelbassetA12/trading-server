@@ -18,7 +18,7 @@ export default function TestnetShart() {
   const alertLinesRef = useRef([]);
   const candleCloseTimeRef = useRef(0);
 
-  const [symbol, setSymbol] = useState("ETHUSDT");
+  const [symbol, setSymbol] = useState("GLMRUSDT");
   const [interval, setIntervalVal] = useState("15m");
   const [lastPrice, setLastPrice] = useState(0);
 
@@ -42,7 +42,7 @@ export default function TestnetShart() {
   const [amount, setAmount] = useState("");
 
   const [signals, setSignals] = useState([]);
-  const [selected, setSelected] = useState("BTCUSDT");
+  const [selected, setSelected] = useState("GLMRUSDT");
 
   const [binanceTrades, setBinanceTrades] = useState([]);
 
@@ -403,9 +403,9 @@ const fetchBalances = async () => {
     const data = await res.json();
 
     const filtered = data.filter((b) =>
-      ["USDT", "XRP", "ETH", "SOL","BTC"].includes(
+      ["USDT", "XRP", "ETH", "SOL","BTC","GLMR"].includes(
         b.asset
-      )
+      ) 
     );
 
     setBalances(filtered);
@@ -798,6 +798,7 @@ const fetchBalances = async () => {
             <option>ETHUSDT</option>
             <option>SOLUSDT</option>
             <option>XRPUSDT</option>
+            <option>GLMRUSDT</option>
           </select>
 
         </div>
@@ -1126,6 +1127,7 @@ const fetchBalances = async () => {
                 <option>BTC</option>
                 <option>ETH</option>
                 <option>SEI</option>
+                <option>GLMR</option>
               </select>
 
             </div>
@@ -1149,6 +1151,7 @@ const fetchBalances = async () => {
                 <option>BTC</option>
                 <option>ETH</option>
                 <option>SEI</option>
+                <option>GLMR</option>
               </select>
 
             </div>
@@ -1331,6 +1334,7 @@ const fetchBalances = async () => {
         <option>BTCUSDT</option>
         <option>ETHUSDT</option>
         <option>SOLUSDT</option>
+        <option>GLMRUSDT</option>
       </select>
     </div>
     <div></div>
@@ -1749,7 +1753,7 @@ const fetchBalances = async () => {
 
             <div className="order-summary">
 
-              <div>
+              <div> 
                 <span>SYMBOL</span>
                 <strong>
                   {selectedOrder.symbol}
